@@ -37,6 +37,9 @@ public class MainActivity extends Activity {
         String tabelleninhalt = dbmgr.ausgabe();
         Toast.makeText(this, tabelleninhalt, Toast.LENGTH_LONG).show();
 
+        Toast.makeText(this, "GitTest", Toast.LENGTH_LONG).show();
+
+
     }
     @Override
     protected void onPause()
