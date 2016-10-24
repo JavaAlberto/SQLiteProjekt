@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">SQLiteProjekt</string>
     <string name="action_settings">Settings</string>
+    <string name="editText_hint_vorname">Vorname</string>
+    <string name="editText_hint_nachname">Nachname</string>
+    <string name="editText_hint_geburtsdatum">Geburtstag</string>
+    <string name="button_add_user">+</string>
+    <string name="editText_errorMessage">Fehler bei der Eingabe</string>
+
 </resources>

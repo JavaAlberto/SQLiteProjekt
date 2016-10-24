@@ -24,6 +24,8 @@ public class DatenbankManager extends SQLiteOpenHelper
             KLASSEN_SELECT_RAW = "SELECT * FROM " + DatenbankManager.DATABASE_TABLE ;
     private SQLiteDatabase sqldb;
     private Context activity;
+    private String[] columns = {"nachname","vorname","geburtsdatum"};
+
 
     public DatenbankManager (Context activity)
     {
@@ -55,6 +57,23 @@ public class DatenbankManager extends SQLiteOpenHelper
 
     public String ausgabe () {
         // sqldb = getReadableDatabase();
+        // Verwendung von query
+        Cursor result = sqldb.query(DATABASE_TABLE, columns, null, null, null, null, null);
+        String mInhalt = "";
+        if (result == null) {
+            Toast.makeText(activity, "Tabelle leer", Toast.LENGTH_LONG).show();
+        } else {
+            while (result.moveToNext()) {
+                mInhalt += result.getString(0) + " " + result.getString(1) + " " + result.getString(2) + "\n";
+            }
+        }
+        sqldb.close();
+        return mInhalt;
+    }
+
+    public String ausgabe1 () {
+        // sqldb = getReadableDatabase();
+        // Verwendung von rawQuery
         Cursor result = sqldb.rawQuery("SELECT * FROM " + DATABASE_TABLE, null);
         String mInhalt = "";
         if (result == null) {
