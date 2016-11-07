@@ -88,15 +88,21 @@ public class DatenbankManager extends SQLiteOpenHelper
         sqldb.close();
         return mInhalt;
     }
-    public long insertRecord()
+
+
+
+
+    // Datensatz in Datenbank schreiben:
+
+    public long insertRecord(String nachname1,String vorname1,SimpleDateFormat df1)
     {
         ContentValues cv =new ContentValues();
         cv.put("nachname", "Meier");
         cv.put("vorname", "Paul");
-        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+        // SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         Calendar cal =  new GregorianCalendar(1958,2-1,10);
-        df.setCalendar(cal);
-        cv.put("geburtsdatum", df.format(cal.getTime()));
+        df1.setCalendar(cal);
+        cv.put("geburtsdatum", df1.format(cal.getTime()));
         long rowId = sqldb.insert(DATABASE_TABLE, null, cv);
         return rowId;
     }
