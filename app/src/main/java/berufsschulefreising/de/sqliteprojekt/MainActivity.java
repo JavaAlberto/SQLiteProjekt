@@ -78,7 +78,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             // array of database column names:
             String [] columns = new String[]  {"_id", "nachname", "vorname", "geburtsdatum"};
         // array of views to display database values
-            int[] viewIds = new int[] {R.id.editText_nachname, R.id.editText_vorname, R.id.editText_geburtstag};
+            int[] viewIds = new int[] {R.id.list_item_textview, R.id.editText_nachname, R.id.editText_vorname, R.id.editText_geburtstag};
             // CursorAdapter to load data from the Cursor into the ListView
            // SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,android.R.layout.simple_list_item_1,null,
             //        columns,viewIds,0);
@@ -164,5 +164,44 @@ public class MainActivity extends Activity implements View.OnClickListener {
        // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         long rowID =  dbmgr.insertRecord(nachnameString,vornameString, df);
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    }
+        // Versuch SimpleCursorAdapter
+        // Ist der Suchstring 3 null, werden alle Datensätze der Tabelle zurückgeliefert
+        Toast.makeText(this, "Cursor bauen",Toast.LENGTH_LONG).show();
+        Cursor cursor = sqldb.query(DatenbankManager.DATABASE_TABLE,
+                dbmgr.columns, null, null, null, null, null);
+        Toast.makeText(this, "DB-Zeilenzahl " + cursor.getCount(),Toast.LENGTH_LONG).show();
+        // Parameter 4:  String-Array der Spalten
+        // Parameter 5: Array  Layouts der Spalten
+        int[] to = new int[]{R.id.textView1, R.id.textView2, R.id.textView3,R.id.textView4};
+        //
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,R.layout.personendaten,cursor,
+                        dbmgr.columns,to,0);
+        ListView personendaten = (ListView) findViewById(R.id.listview_personendaten);
+        personendaten.setAdapter(adapter);
+          // http://www.programcreek.com/java-api-examples/android.widget.SimpleCursorAdapter
+        // https://www.youtube.com/watch?v=DCtSw4pUj5s
+              }
+
+   /* public List  getAllShoppingMemos() {
+        List  shoppingList = new ArrayList<>();
+        // Ist der Suchstring 3 null, werden alle Datensätze der Tabelle zurückgeliefert
+        Cursor cursor = sqldb.query(DatenbankManager.DATABASE_TABLE,
+                dbmgr.columns, null, null, null, null, null);
+
+        cursor.moveToFirst();
+
+        while(!cursor.isAfterLast())
+        {
+            // Objekt aus Datensatz bilden über Methodenaufruf
+            shopping = cursorToShopping(cursor);
+            // Objekt der Liste hinzufügen
+            shoppingList.add(shopping);
+            Log.d(LOG_TAG, "ID: " + shopping.getId() + ", Inhalt: " + shopping.toString());
+            cursor.moveToNext();
+        }
+        // Wichtig : Schließen des Cursors !!
+        cursor.close();
+        // Liste mit allen Shopping-Objekten wird zurückgegeben
+        return shoppingList;
+    }*/
 }
