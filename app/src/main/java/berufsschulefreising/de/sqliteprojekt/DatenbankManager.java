@@ -19,12 +19,12 @@ public class DatenbankManager extends SQLiteOpenHelper
 
     private static final int DATENBANK_VERSION = 1;
     private static final String DATENBANK_NAME = "formularDatenbank.db";
-    private static final String DATABASE_TABLE = "personenDaten";
+      static final String DATABASE_TABLE = "personenDaten";
     public static final String
             KLASSEN_SELECT_RAW = "SELECT * FROM " + DatenbankManager.DATABASE_TABLE ;
     private SQLiteDatabase sqldb;
     private Context activity;
-    private String[] columns = {"nachname","vorname","geburtsdatum"};
+      String[] columns = {"_id","nachname","vorname","geburtsdatum"};
 
 
     public DatenbankManager (Context activity)
@@ -93,16 +93,16 @@ public class DatenbankManager extends SQLiteOpenHelper
 
 
     // Datensatz in Datenbank schreiben:
-
-    public long insertRecord(String nachname1,String vorname1,SimpleDateFormat df1)
+    public long insertRecord(String nachname1,String vorname1,String df1)
+    // public long insertRecord(String nachname1,String vorname1,SimpleDateFormat df1)
     {
         ContentValues cv =new ContentValues();
-        cv.put("nachname", "Meier");
-        cv.put("vorname", "Paul");
+        cv.put("nachname", nachname1);
+        cv.put("vorname", vorname1);
         // SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         Calendar cal =  new GregorianCalendar(1958,2-1,10);
-        df1.setCalendar(cal);
-        cv.put("geburtsdatum", df1.format(cal.getTime()));
+       //  df1.setCalendar(cal);
+        cv.put("geburtsdatum", df1);
         long rowId = sqldb.insert(DATABASE_TABLE, null, cv);
         return rowId;
     }

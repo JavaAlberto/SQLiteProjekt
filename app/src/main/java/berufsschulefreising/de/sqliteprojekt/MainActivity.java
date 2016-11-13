@@ -135,7 +135,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View v)
     {
-       // Datensatz einlesen:
+        String datum = "";
+        // Datensatz einlesen:
         EditText nachname = (EditText) findViewById(R.id.editText_nachname);
         String nachnameString = nachname.getText().toString();
         EditText vorname = (EditText) findViewById(R.id.editText_vorname);
@@ -151,18 +152,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         Date date;
         EditText geburtstag = (EditText) findViewById(R.id.editText_geburtstag);
+
         try {
-            date = df.parse(geburtstag.getText().toString());
-            String myStringDate = date.getDay() + "-" + date.getMonth() + "-" + date.getYear();
-            Toast.makeText(this, "Eingelesenes Datum: " + myStringDate ,Toast.LENGTH_LONG).show();
+           // date = df.parse(geburtstag.getText().toString());
+              datum = geburtstag.getText().toString();
+           //  String myStringDate = date.getDay() + "-" + date.getMonth() + "-" + date.getYear();
+           //  Toast.makeText(this, "Eingelesenes Datum: " + myStringDate ,Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Eingelesenes Datum: " + datum ,Toast.LENGTH_LONG).show();
         }
-        catch (ParseException e)
+        catch (Exception e)
+        // catch (ParseException e)
         { e.printStackTrace();
             Toast.makeText(this, "Fehler beim Parsen des Datums",Toast.LENGTH_LONG).show();
             geburtstag.setError(getString(R.string.editText_errorMessage));
         }
        // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        long rowID =  dbmgr.insertRecord(nachnameString,vornameString, df);
+       // long rowID =  dbmgr.insertRecord(nachnameString,vornameString, df);
+        long rowID =  dbmgr.insertRecord(nachnameString,vornameString, datum);
       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         // Versuch SimpleCursorAdapter
         // Ist der Suchstring 3 null, werden alle Datensätze der Tabelle zurückgeliefert
