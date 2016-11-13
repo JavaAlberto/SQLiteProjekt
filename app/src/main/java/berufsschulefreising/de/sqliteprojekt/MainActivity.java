@@ -34,42 +34,18 @@ import java.util.List;
 public class MainActivity extends Activity implements View.OnClickListener {
 
 
+    Button user;
     Cursor cursor;
     DatenbankManager dbmgr;
     SQLiteDatabase sqldb;
-    Button user;
-    String [] userListeArray = {
-            "Müller", "Maier",  "Schmidt", "Huber", "Pfleiderer", "Eiermann", "Fischer"} ;
-    List <String> userList = new ArrayList<String> (Arrays.asList(userListeArray));
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         dbmgr = new DatenbankManager(this);
-       /*
-        // Datensatz einfügen:
-        Toast.makeText(this,"Datensatz einfügen", Toast.LENGTH_LONG).show();
-        long rowID =  dbmgr.insertRecord();
-        Toast.makeText(this,"row ID" + rowID, Toast.LENGTH_LONG).show();
-        // Datenbank  aus lesen:
-        Toast.makeText(this,"Aufruf Ausgabemethode", Toast.LENGTH_LONG).show();
-        String tabelleninhalt = dbmgr.ausgabe();
-        Toast.makeText(this, tabelleninhalt, Toast.LENGTH_LONG).show();
-        Toast.makeText(this, "GitTest", Toast.LENGTH_LONG).show();
-        */
         user = (Button) findViewById(R.id.button_add_user);
         user.setOnClickListener(this);
-
-        //==========Datenbankinhalt auslesen ============
-        // Auslesen und Darstellung der Inhalte der Datenbank mit Hilfe des SimpleCursorAdapter
-        // https://developer.android.com/reference/android/widget/SimpleCursorAdapter.html#SimpleCursorAdapter(android.content.Context,%20int,%20android.database.Cursor,%20java.lang.String[],%20int[],%20int)
-        String anzeigeSpalten[] = {"_id", "Nachname", "Vorname", "Geburtsdatum"};
-
-        // R.layout.list_item   >  ID der XML-Layout Datei
-        // int: resource identifier of a layout file that defines the views for this list item.
-        // The layout file should include at least those named views defined in "to"
-        //  R.id.list_item_textview   > ID der TextView
         initializeContentLoader();
     }
         private void initializeContentLoader()
@@ -92,12 +68,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             userListView.setAdapter(adapter);  */
 
                // ============================================================
-        ArrayAdapter <String> adapter = new ArrayAdapter<String>(
-                this,                             // Die aktuelle Umgebung (diese Activity)
-                R.layout.list_item,                         // ID der XML-Layout Datei (mit TextView)
-                R.id.list_item_textview,                    // ID der TextView in der XML-Datei
-                userList);                              // Beispieldaten in einer ArrayList
-            Toast.makeText(this,"Adapter: "+ adapter.getCount(), Toast.LENGTH_LONG).show();
+
             //=================== =============================================
         // Erweiterung des Layout
             // obtains th LayoutInflater from the given Context
@@ -112,8 +83,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
            // Bezug auf die ListView in der activity_main.xml
             // Suchen der ListView aus der root-View:
-            ListView userListView = (ListView) rootView.findViewById(R.id.listview_personendaten);
-             userListView.setAdapter(adapter);
+
         //http://khajanpndey.blogspot.de/2012/12/android-layoutinflater-tutorial.html
         // =============================================================================
         }
@@ -129,85 +99,64 @@ public class MainActivity extends Activity implements View.OnClickListener {
     {
         super.onResume();
         sqldb = dbmgr.getReadableDatabase();
-        Cursor tabellenCursor = sqldb.rawQuery(DatenbankManager.KLASSEN_SELECT_RAW, null);
+       //  Cursor tabellenCursor = sqldb.rawQuery(DatenbankManager.KLASSEN_SELECT_RAW, null);
         Toast.makeText(this, "Datenbank geöffnet",Toast.LENGTH_LONG).show();
     }
     @Override
-    public void onClick(View v)
-    {
+    public void onClick(View v) {
         String datum = "";
         // Datensatz einlesen:
         EditText nachname = (EditText) findViewById(R.id.editText_nachname);
         String nachnameString = nachname.getText().toString();
         EditText vorname = (EditText) findViewById(R.id.editText_vorname);
-        String vornameString = nachname.getText().toString();
+        String vornameString = vorname.getText().toString();
         // Fehlermeldung GUI
-        if(TextUtils.isEmpty(nachnameString))  {
+        if (TextUtils.isEmpty(nachnameString)) {
             nachname.setError(getString(R.string.editText_errorMessage));
         }
-        if(TextUtils.isEmpty(vornameString)) {
+        if (TextUtils.isEmpty(vornameString)) {
             vorname.setError(getString(R.string.editText_errorMessage));
         }
-        Toast.makeText(this, "Vorname und Nachname: " + vornameString + " " + nachnameString ,Toast.LENGTH_LONG).show();
-        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-        Date date;
+        Toast.makeText(this, "Vorname und Nachname: " + vornameString + " " + nachnameString, Toast.LENGTH_LONG).show();
         EditText geburtstag = (EditText) findViewById(R.id.editText_geburtstag);
-
         try {
-           // date = df.parse(geburtstag.getText().toString());
-              datum = geburtstag.getText().toString();
-           //  String myStringDate = date.getDay() + "-" + date.getMonth() + "-" + date.getYear();
-           //  Toast.makeText(this, "Eingelesenes Datum: " + myStringDate ,Toast.LENGTH_LONG).show();
-            Toast.makeText(this, "Eingelesenes Datum: " + datum ,Toast.LENGTH_LONG).show();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String date = geburtstag.getText().toString(); // EditText to check
+            java.util.Date parsedDate = dateFormat.parse(date);
+            // Eingabefelder leeren:
+            nachname.setText("");
+            vorname.setText("");
+            geburtstag.setText("");
+            // Eingabedatensatz beseitigen:
+            long rowID = dbmgr.insertRecord(nachnameString, vornameString, date);
+
+            this.showAllEntries();
+
+        } catch (java.text.ParseException e) {
+            Toast.makeText(this, "Datum: falsche Eingabe" + "(parse error)", Toast.LENGTH_LONG).show();
         }
-        catch (Exception e)
-        // catch (ParseException e)
-        { e.printStackTrace();
-            Toast.makeText(this, "Fehler beim Parsen des Datums",Toast.LENGTH_LONG).show();
-            geburtstag.setError(getString(R.string.editText_errorMessage));
-        }
-       // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-       // long rowID =  dbmgr.insertRecord(nachnameString,vornameString, df);
-        long rowID =  dbmgr.insertRecord(nachnameString,vornameString, datum);
-      // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-        // Versuch SimpleCursorAdapter
-        // Ist der Suchstring 3 null, werden alle Datensätze der Tabelle zurückgeliefert
-        Toast.makeText(this, "Cursor bauen",Toast.LENGTH_LONG).show();
-        Cursor cursor = sqldb.query(DatenbankManager.DATABASE_TABLE,
-                dbmgr.columns, null, null, null, null, null);
-        Toast.makeText(this, "DB-Zeilenzahl " + cursor.getCount(),Toast.LENGTH_LONG).show();
+    }
+        public void showAllEntries()
+    {
+        // Vorbereitung Ausgabe Datenbankinhalt mit SimpleCursorAdapter
+        Toast.makeText(this, "Cursor für SimpleCursorAdapter erzeugen",Toast.LENGTH_LONG).show();
+        // Ist der Parameter 3 null, werden alle Datensätze der Tabelle zurückgeliefert:
+        Cursor cursor = sqldb.query(DatenbankManager.DATABASE_TABLE, dbmgr.columns, null, null, null, null, null);
+        Toast.makeText(this, "Test: DB-Zeilenzahl abfragen: " + cursor.getCount(),Toast.LENGTH_LONG).show();
+        // SimpleCursorAdapter:
+        // Parameter 1: App-Contex
+        //  Parameter 2: resource-ID des Tabellenlayout
+        //  Parameter 2: resource-ID des Tabellenlayout
         // Parameter 4:  String-Array der Spalten
         // Parameter 5: Array  Layouts der Spalten
-        int[] to = new int[]{R.id.textView1, R.id.textView2, R.id.textView3,R.id.textView4};
-        //
+        int[] to = new int[]{R.id.textView_id, R.id.textView_nachname, R.id.textView_vorname,R.id.textView_geburtstag};
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,R.layout.personendaten,cursor,
-                        dbmgr.columns,to,0);
+                dbmgr.columns,to,0);
         ListView personendaten = (ListView) findViewById(R.id.listview_personendaten);
         personendaten.setAdapter(adapter);
-          // http://www.programcreek.com/java-api-examples/android.widget.SimpleCursorAdapter
-        // https://www.youtube.com/watch?v=DCtSw4pUj5s
-              }
+    }
 
-   /* public List  getAllShoppingMemos() {
-        List  shoppingList = new ArrayList<>();
-        // Ist der Suchstring 3 null, werden alle Datensätze der Tabelle zurückgeliefert
-        Cursor cursor = sqldb.query(DatenbankManager.DATABASE_TABLE,
-                dbmgr.columns, null, null, null, null, null);
 
-        cursor.moveToFirst();
 
-        while(!cursor.isAfterLast())
-        {
-            // Objekt aus Datensatz bilden über Methodenaufruf
-            shopping = cursorToShopping(cursor);
-            // Objekt der Liste hinzufügen
-            shoppingList.add(shopping);
-            Log.d(LOG_TAG, "ID: " + shopping.getId() + ", Inhalt: " + shopping.toString());
-            cursor.moveToNext();
-        }
-        // Wichtig : Schließen des Cursors !!
-        cursor.close();
-        // Liste mit allen Shopping-Objekten wird zurückgegeben
-        return shoppingList;
-    }*/
+
 }
