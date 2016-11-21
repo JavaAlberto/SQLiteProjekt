@@ -1,35 +1,28 @@
 package berufsschulefreising.de.sqliteprojekt;
 
 import android.app.Activity;
-import android.content.ContentValues;
+import android.app.ListActivity;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
-import android.view.View;
+import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
+import android.view.View;
+import android.widget.AbsListView;
 import android.widget.Button;
-import android.widget.CursorAdapter;
+import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
+
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -39,6 +32,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     DatenbankManager dbmgr;
     SQLiteDatabase sqldb;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,117 +40,210 @@ public class MainActivity extends Activity implements View.OnClickListener {
         dbmgr = new DatenbankManager(this);
         user = (Button) findViewById(R.id.button_add_user);
         user.setOnClickListener(this);
-        initializeContentLoader();
+        // -----------------------------------------------
+
+        // ************* funktioniert nicht ***************************
+         // ctv = (CheckedTextView) findViewById(R.id.listItemMultiChoiceWrapper);
+
+
+        final CheckedTextView  ctv = (CheckedTextView) findViewById(R.id.text1);
+        /*  checkedTextView1 =(CheckedTextView)findViewById(R.id.checked_textview1);
+        // Toast.makeText(this, "CheckedTextView" + checkedTextView, Toast.LENGTH_LONG).show(); -*/
+         // Log.e(ctv.toString(),"error1");
+      /* ctv.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v)
+            {
+                ((CheckedTextView) v).toggle();
+            }
+        });
+             ctv.setOnClickListener(this);*/
+
+        // ----------------------------
+
+        // ------- Contextuel ActionBar initialisieren -------------
+        this.initializeContextualActionBar();
+        //--------------------------------------------------------
+
+
+
+
     }
-        private void initializeContentLoader()
-        {
-            // http://www.appstoremarketresearch.com/articles/android-tutorial-loader-simple-cursor-adapter/
-            // array of database column names:
-            String [] columns = new String[]  {"_id", "nachname", "vorname", "geburtsdatum"};
-        // array of views to display database values
-            int[] viewIds = new int[] {R.id.list_item_textview, R.id.editText_nachname, R.id.editText_vorname, R.id.editText_geburtstag};
-            // CursorAdapter to load data from the Cursor into the ListView
-           // SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,android.R.layout.simple_list_item_1,null,
-            //        columns,viewIds,0);
-            // tie the CursorAdapter to the ListView
-            // https://www.bignerdranch.com/blog/understanding-androids-layoutinflater-inflate/
-           // LayoutInflater (which coverts an XML layout file into corresponding ViewGroups and Widgets
-            //http://www.programmierenlernenhq.de/tutorial-android-listview-verwenden/
-           /* LayoutInflater inflater = this.getLayoutInflater();
-            View rootView = inflater.inflate(R.layout.activity_main, container, false);
-            ListView userListView = (ListView) rootView.findViewById(R.id.listview_personendaten);
-            userListView.setAdapter(adapter);  */
 
-               // ============================================================
-
-            //=================== =============================================
-        // Erweiterung des Layout
-            // obtains th LayoutInflater from the given Context
-        LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-        // Parameter 1: Ressourcen-ID des Layouts das aufgebaut werden soll
-            // Parameter 2: ViewGroup: Eltern das Layouts
-            // Paramter 3: Einn Wert der angiebt, ob das aufgebaute Layout zur ViewGroup beigefügt werden soll
-            // Hier bedeutet false dass das System bereits das aufgebaute Layout in den container einsetzt
-            // true würde eine redundante Viewgroup im endgültige Layout erstellen
-            // Google-Book: Android Apps erstellen
-            View rootView = inflater.inflate(R.layout.activity_main,null);
-
-           // Bezug auf die ListView in der activity_main.xml
-            // Suchen der ListView aus der root-View:
-
-        //http://khajanpndey.blogspot.de/2012/12/android-layoutinflater-tutorial.html
-        // =============================================================================
-        }
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
         dbmgr.close();
         Toast.makeText(this, "Datenbank geschlossen", Toast.LENGTH_LONG).show();
     }
+
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
         sqldb = dbmgr.getReadableDatabase();
-       //  Cursor tabellenCursor = sqldb.rawQuery(DatenbankManager.KLASSEN_SELECT_RAW, null);
-        Toast.makeText(this, "Datenbank geöffnet",Toast.LENGTH_LONG).show();
+        //  Cursor tabellenCursor = sqldb.rawQuery(DatenbankManager.KLASSEN_SELECT_RAW, null);
+        Toast.makeText(this, "Datenbank geöffnet", Toast.LENGTH_LONG).show();
     }
+
     @Override
-    public void onClick(View v) {
-        String datum = "";
-        // Datensatz einlesen:
-        EditText nachname = (EditText) findViewById(R.id.editText_nachname);
-        String nachnameString = nachname.getText().toString();
-        EditText vorname = (EditText) findViewById(R.id.editText_vorname);
-        String vornameString = vorname.getText().toString();
-        // Fehlermeldung GUI
-        if (TextUtils.isEmpty(nachnameString)) {
-            nachname.setError(getString(R.string.editText_errorMessage));
-        }
-        if (TextUtils.isEmpty(vornameString)) {
-            vorname.setError(getString(R.string.editText_errorMessage));
-        }
-        Toast.makeText(this, "Vorname und Nachname: " + vornameString + " " + nachnameString, Toast.LENGTH_LONG).show();
-        EditText geburtstag = (EditText) findViewById(R.id.editText_geburtstag);
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            String date = geburtstag.getText().toString(); // EditText to check
-            java.util.Date parsedDate = dateFormat.parse(date);
-            // Eingabefelder leeren:
-            nachname.setText("");
-            vorname.setText("");
-            geburtstag.setText("");
-            // Eingabedatensatz beseitigen:
-            long rowID = dbmgr.insertRecord(nachnameString, vornameString, date);
-
-            this.showAllEntries();
-
-        } catch (java.text.ParseException e) {
-            Toast.makeText(this, "Datum: falsche Eingabe" + "(parse error)", Toast.LENGTH_LONG).show();
-        }
-    }
-        public void showAllEntries()
+    public void onClick(View v)
     {
+   // ---------------------------------
+       /* switch(v.getId()) {
+            case R.id.listItemMultiChoiceWrapper: {
+                Toast.makeText(this, "Checkbox angeklickt", Toast.LENGTH_LONG).show();
+                if (ctv.isChecked())
+                    ctv.setChecked(false);
+                else {
+                    ctv.setChecked(true);
+                }
+                break;
+            }
+        }*/
+        // ---------------------------------
+
+
+                String datum = "";
+                // Datensatz einlesen:
+                EditText nachname = (EditText) findViewById(R.id.editText_nachname);
+                String nachnameString = nachname.getText().toString();
+                EditText vorname = (EditText) findViewById(R.id.editText_vorname);
+                String vornameString = vorname.getText().toString();
+                // Fehlermeldung GUI
+                if (TextUtils.isEmpty(nachnameString)) {
+                    nachname.setError(getString(R.string.editText_errorMessage));
+                }
+                if (TextUtils.isEmpty(vornameString)) {
+                    vorname.setError(getString(R.string.editText_errorMessage));
+                }
+                Toast.makeText(this, "Vorname und Nachname: " + vornameString + " " + nachnameString, Toast.LENGTH_LONG).show();
+                EditText geburtstag = (EditText) findViewById(R.id.editText_geburtstag);
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String date = geburtstag.getText().toString(); // EditText to check
+                    java.util.Date parsedDate = dateFormat.parse(date);
+                    // Eingabefelder leeren:
+                    nachname.setText("");
+                    vorname.setText("");
+                    geburtstag.setText("");
+                    // Eingabedatensatz beseitigen:
+                    long rowID = dbmgr.insertRecord(nachnameString, vornameString, date);
+
+                    this.showAllEntries();
+
+                } catch (java.text.ParseException e) {
+                    Toast.makeText(this, "Datum: falsche Eingabe" + "(parse error)", Toast.LENGTH_LONG).show();
+                }
+            }
+
+
+    public void showAllEntries() {
         // Vorbereitung Ausgabe Datenbankinhalt mit SimpleCursorAdapter
-        Toast.makeText(this, "Cursor für SimpleCursorAdapter erzeugen",Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Cursor für SimpleCursorAdapter erzeugen", Toast.LENGTH_LONG).show();
         // Ist der Parameter 3 null, werden alle Datensätze der Tabelle zurückgeliefert:
         Cursor cursor = sqldb.query(DatenbankManager.DATABASE_TABLE, dbmgr.columns, null, null, null, null, null);
-        Toast.makeText(this, "Test: DB-Zeilenzahl abfragen: " + cursor.getCount(),Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Test: DB-Zeilenzahl abfragen: " + cursor.getCount(), Toast.LENGTH_LONG).show();
         // SimpleCursorAdapter:
         // Parameter 1: App-Contex
         //  Parameter 2: resource-ID des Tabellenlayout
         //  Parameter 2: resource-ID des Tabellenlayout
         // Parameter 4:  String-Array der Spalten
         // Parameter 5: Array  Layouts der Spalten
-        int[] to = new int[]{R.id.textView_id, R.id.textView_nachname, R.id.textView_vorname,R.id.textView_geburtstag};
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,R.layout.personendaten,cursor,
-                dbmgr.columns,to,0);
+         int[] to = new int[]{R.id.textView_id, R.id.textView_nachname, R.id.textView_vorname, R.id.textView_geburtstag};
+          SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.personendaten, cursor,
+                dbmgr.columns, to, 0);
+        adapter.getItemId(R.id.text1);
+         // int[] to = new int[]{R.id.textView_id, R.id.textView_nachname, R.id.textView_vorname, R.id.textView_geburtstag};
+       // Vogella http://www.vogella.com/tutorials/AndroidListView/article.html
+
+        // Jede Reihe besitzt aufgrund dieses Layout eine textview und eine Checkbox / Komatineni Android 4 170
+       //  SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_multiple_choice, cursor,
+          //       dbmgr.columns, to, 0);
+
         ListView personendaten = (ListView) findViewById(R.id.listview_personendaten);
         personendaten.setAdapter(adapter);
+
+        // personendaten.setAdapter(adapter);
+        // Erweiterung:
+        personendaten.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        // -----------------------------------
+          // Komatineni Android 4 169
+       // http://abhiandroid.com/ui/checkedtextview
     }
 
 
+    // =================================================================================================
+    // Contextual ActionBar
+    //  --------------------------------------------------------------------------------------------------
+    private void initializeContextualActionBar() {
+        Toast.makeText(this, "Initializ CAB", Toast.LENGTH_LONG).show();
 
+        final ListView personenListView = (ListView) findViewById(R.id.listview_personendaten);
+        personenListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+    //=============================
+        //  setContentView(R.layout.personendaten);
+        /*TextView v1=  (TextView) personenListView.findViewById(R.id.editText_geburtstag);
+        Log.e(v1.toString(),"error1");*/
+        // ==================================
+        personenListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
 
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                Toast.makeText(getBaseContext(), "onItemCheckedStateChanged", Toast.LENGTH_LONG).show();
+
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                getMenuInflater().inflate(R.menu.menue_cab, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                switch (item.getItemId()) {
+                    // hier gibt es bisher nur ein "item"
+                    case R.id.cab_delete:
+                       // Toast.makeText(getBaseContext(), "Element delete ausgewählt ", Toast.LENGTH_LONG).show();
+                        SparseBooleanArray touchedPersonPositions = personenListView.getCheckedItemPositions();
+                        // iterieren über alle Elemente
+                        Toast.makeText(getBaseContext(), "touchedPositions", Toast.LENGTH_LONG).show();
+                        for (int i = 0; i < touchedPersonPositions.size(); i++) {
+                            boolean isChecked = touchedPersonPositions.valueAt(i);
+
+                            if (isChecked) {
+                                int postitionInListView = touchedPersonPositions.keyAt(i);
+                               /* Shopping shopping = (Shopping) personenListView.getItemAtPosition(postitionInListView);
+                                Log.d(LOG_TAG, "Position im ListView: " + postitionInListView + " Inhalt: " + shopping.toString());
+                                dbmgr.deleteShopping(shopping);*/
+                            }
+                        }
+                        showAllEntries();
+                        mode.finish();
+                        return true;
+
+                    default:
+                        return false;
+                }
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+
+            }
+        });
+        // Contextual ActionBAr
+        // ---------------------------------------------------------------------------------------------------------------
+// http://kb4dev.com/tutorial/android-listview/android-listview-with-checkbox
+        // http://stackoverflow.com/questions/25414334/disable-checkbox-in-a-simple-list-view-multi-choice
+        // http://www.technotalkative.com/contextual-action-bar-cab-android/
+        // http://stackoverflow.com/questions/35021271/is-there-any-built-in-item-checked-listener-on-android-listview
+      // https://developer.android.com/guide/topics/ui/menus.html#CAB
+        // Achtung:
+        // http://stackoverflow.com/questions/8369640/listview-setitemchecked-only-works-with-standard-arrayadapter-does-not-work-w
+    }
 }
