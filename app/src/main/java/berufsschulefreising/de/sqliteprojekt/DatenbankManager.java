@@ -5,6 +5,10 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.Cursor;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.widget.AbsListView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
@@ -90,8 +94,6 @@ public class DatenbankManager extends SQLiteOpenHelper
     }
 
 
-
-
     // Datensatz in Datenbank schreiben:
     public long insertRecord(String nachname1,String vorname1,String df1)
     // public long insertRecord(String nachname1,String vorname1,SimpleDateFormat df1)
@@ -106,4 +108,5 @@ public class DatenbankManager extends SQLiteOpenHelper
         long rowId = sqldb.insert(DATABASE_TABLE, null, cv);
         return rowId;
     }
+
     }

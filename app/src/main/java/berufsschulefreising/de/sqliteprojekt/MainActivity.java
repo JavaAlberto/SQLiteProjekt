@@ -23,6 +23,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.text.SimpleDateFormat;
 
+import static berufsschulefreising.de.sqliteprojekt.R.layout.personendaten;
+
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
@@ -149,7 +151,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         // Parameter 4:  String-Array der Spalten
         // Parameter 5: Array  Layouts der Spalten
          int[] to = new int[]{R.id.textView_id, R.id.textView_nachname, R.id.textView_vorname, R.id.textView_geburtstag};
-          SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, R.layout.personendaten, cursor,
+          SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, personendaten, cursor,
                 dbmgr.columns, to, 0);
         adapter.getItemId(R.id.text1);
          // int[] to = new int[]{R.id.textView_id, R.id.textView_nachname, R.id.textView_vorname, R.id.textView_geburtstag};
@@ -165,10 +167,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         // personendaten.setAdapter(adapter);
         // Erweiterung:
         personendaten.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
+        }
         // -----------------------------------
           // Komatineni Android 4 169
        // http://abhiandroid.com/ui/checkedtextview
-    }
+
 
 
     // =================================================================================================
@@ -190,6 +194,16 @@ public class MainActivity extends Activity implements View.OnClickListener {
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
                 Toast.makeText(getBaseContext(), "onItemCheckedStateChanged", Toast.LENGTH_LONG).show();
 
+               // ------------------------------------------------------------------------------------------------------
+                //Diese Zeilen zeigen dass die Elemente tatsächlich gecheckt werden, dies ist jedoch nicht sichtbar
+                // http://stackoverflow.com/questions/5612600/listview-with-choice-mode-multiple-using-checkedtext-in-a-custom-view
+                Toast.makeText(getBaseContext(), "Zahl der gecheckten Elemente " + personenListView.getCheckedItemCount(), Toast.LENGTH_LONG).show();
+
+                final long[] checkedIds = personenListView.getCheckedItemIds();
+                for ( int i = 0 ; i < personenListView.getCheckedItemCount() ; i++ ) {
+                    Log.d("check", "id checked: " + checkedIds[i]);  }
+
+                // ------------------------------------------------------------------------------------------------------
             }
 
             @Override
