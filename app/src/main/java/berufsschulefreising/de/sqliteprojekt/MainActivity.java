@@ -161,7 +161,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
        //  SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_multiple_choice, cursor,
           //       dbmgr.columns, to, 0);
 
-        ListView personendaten = (ListView) findViewById(R.id.listview_personendaten);
+        MyListView personendaten = (MyListView) findViewById(R.id.listview_personendaten);
         personendaten.setAdapter(adapter);
 
         // personendaten.setAdapter(adapter);
@@ -181,7 +181,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private void initializeContextualActionBar() {
         Toast.makeText(this, "Initializ CAB", Toast.LENGTH_LONG).show();
 
-        final ListView personenListView = (ListView) findViewById(R.id.listview_personendaten);
+        final MyListView personenListView = (MyListView) findViewById(R.id.listview_personendaten);
         personenListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
     //=============================
         //  setContentView(R.layout.personendaten);
